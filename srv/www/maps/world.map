@@ -1,0 +1,81 @@
+# Based on https://mapserver.gis.umn.edu/ogc/wfs_server.html#example-wfs-server-mapfile
+MAP
+  NAME "WorldBorders"
+  STATUS ON
+  SIZE 400 300
+#  SYMBOLSET "../etc/symbols.txt"
+  EXTENT -180 -90 180 90
+  UNITS DD
+  SHAPEPATH "demo"
+  IMAGECOLOR 255 255 255
+#  FONTSET "../etc/fonts.txt"
+  INCLUDE "formats.include"
+
+  DEBUG 5
+  CONFIG "MS_ERRORFILE" "/var/tmp/ms_error.txt"
+
+
+  #
+  # Start of web interface definition
+  #
+  WEB
+    IMAGEPATH "/var/tmp/"
+    IMAGEURL "/var/tmp/"
+    METADATA
+      "wfs_title"          "TM_WORLD_BORDERS"
+      "wfs_onlineresource" "https://mapserver.example.org/wms?"
+      "wfs_srs"            "EPSG:4326 EPSG:90091 EPSG:4269 EPSG:3978 EPSG:3857"
+      "wms_srs"            "EPSG:4326 EPSG:90091 EPSG:3857 EPSG:54009"
+      "wfs_abstract"       "This text describes my WFS service."
+      "ows_enable_request" "*"
+      "wfs_enable_request" "*" 
+      "wms_enable_request" "*"
+    END
+  END
+
+  PROJECTION
+    "init=epsg:4326"
+  END
+
+
+
+  #
+  # Start of layer definitions
+  #
+
+  ##################
+  # Countries of the World - be nice it is never 100% precise nor
+  # accurate...
+  ##################
+  LAYER
+    NAME "countries"
+    METADATA
+      "wfs_title"         "Countries"
+      "wfs_srs"           "EPSG:4326"
+      "gml_include_items" "all"
+      "gml_featureid"     "ID"
+      "wfs_enable_request" "*"
+      "wms_enable_request" "*"
+    END
+    TYPE POLYGON
+    STATUS ON
+    DATA "TM_WORLD_BORDERS-0.3.shp"
+    PROJECTION
+      "init=epsg:4326"
+    END
+    COMPOSITE
+      OPACITY 50 
+    END
+    CLASS
+      NAME 'Countries'
+      STYLE
+        COLOR 255 128 128
+        OUTLINECOLOR 96 96 96
+      END
+    END
+  END #layer
+################## add includes to extend.include #####
+  INCLUDE "extend.include"
+#######################################################
+END #mapfile
+

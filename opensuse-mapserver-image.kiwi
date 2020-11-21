@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- OBS-ExcludeArch: i586 s390 -->
+
+<image schemaversion="6.5" name="opensuse-mapserver-image" xmlns:suse_label_helper="com.suse.label_helper">
+  <description type="system">
+    <author>Boris Manojlovic</author>
+    <contact>boris@steki.net</contact>
+    <specification>openSUSE image containing mapserver.</specification>
+  </description>
+  <preferences>
+    <type image="docker" derived_from="obsrepositories:/apache2">
+      <containerconfig name="mapserver" tag="latest" additionaltags="%PKG_VERSION%,%PKG_VERSION%-%RELEASE%" maintainer="Boris Manojlovic &lt;boris@steki.net&gt;">
+        <entrypoint execute="/tini">
+          <argument name="--" />
+          <argument name="/entrypoint/entrypoint.sh" />
+        </entrypoint>
+        <subcommand execute="/usr/sbin/start_apache2">
+          <argument name="-DFOREGROUND" />
+        </subcommand>
+        <expose>
+          <port number='80/tcp' />
+          <port number='443/tcp' />
+        </expose>
+        <volumes>
+          <!--  These are volumes for performance reasons... -->
+          <volume name="/srv/www/maps/data" />
+          <volume name="/srv/www/maps/cache" />
+        </volumes>
+        <labels>
+          <suse_label_helper:add_prefix prefix="net.steki.mapserver">
+            <label name="org.opencontainers.image.title" value="openSUSE based mapserver container" />
+            <label name="org.opencontainers.image.description" value="Image containing mapserver." />
+            <label name="org.opencontainers.image.version" value="%PKG_VERSION%-%RELEASE%" />
+            <label name="org.opencontainers.image.created" value="%BUILDTIME%" />
+            <label name="org.opensuse.reference" value="registry.opensuse.org/home/bmanojlovic/geo/containers/mapserver:%PKG_VERSION%-%RELEASE%" />
+            <label name="org.openbuildservice.disturl" value="%DISTURL%" />
+          </suse_label_helper:add_prefix>
+        </labels>
+        <history author="Boris Manojlovic &lt;boris@steki.net&gt;">openSUSE based mapserver container</history>
+      </containerconfig>
+    </type>
+    <version>1.0.0</version>
+    <packagemanager>zypper</packagemanager>
+    <rpm-excludedocs>false</rpm-excludedocs>
+  </preferences>
+  <repository>
+    <source path="obsrepositories:/" />
+  </repository>
+  <packages type="image">
+    <package name="unzip" />
+    <package name="mapserver" />
+    <package name="mapcache" />
+    <package name="apache2-mod_fcgid" />
+    <package name="tar" /> <!-- to be able to copy files in k8s env -->
+    <archive name="entrypoint.tar.gz" />
+  </packages>
+</image>
